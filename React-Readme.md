@@ -332,6 +332,74 @@ a good thing. It means that the only way that you can change the store is by dis
 
 Store can't be changed directly. The store doesn't actually handle the actions that you dispatch, actions are handled by reducers.
 
+## Immutability and Why we choose immutability?
+
+**_Refer PDF_** -> Immutability
+
+**_Why Immutability?_**
+
+1. Clarity -> First, immutability means clarity. In many application architectures, If you think where did that state  
+   change? What line of code just changed that value from 0 to 1? Redux's centralized immutable store means that I no longer ask myself  
+   these silly and time‑consuming questions. When state is updated, I know exactly where and how it happened. I just tell myself it was  
+   in the reducer.  
+   When state changes in a Redux app, you know where it occurred. You know someone wrote some code in a reducer that returned a new copy  
+   of state, because it means that you're clear about what file to open to actually see state changing.  
+   In traditional apps, many files could potentially be manipulating state. In Redux, you don't have to wonder where the state update  
+   occurred. As long as you're using Redux to handle your state, then you know that it occurred in your reducer.
+
+   ![clarity](./img/clarity.png)
+
+2. Performance -> To understand why immutable state is so useful for performance, imagine that we have a large state object with many  
+   properties. If state were immutable, Redux would have to do an expensive operation to determine if state has changed. It would have to  
+   check every single property on your state object to determine if any state had changed. But if state is immutable, suddenly this  
+   expensive operation of checking every single property is no longer necessary.  
+   Instead, Redux can simply do a reference comparison. (`if(previousStoreState !== storeState)...`) If the old state isn't referencing  
+   the same object in memory, then we know that the state has changed. This is extremely efficient. And behind the scenes, React‑Redux  
+   can use this simple reference comparison to determine when to notify React of state changes. It won't rerender the component if  
+   nothing has changed. So immutability doesn't just make your app more predictable and easier to think about. It also helps improve  
+   performance.
+
+   ![performace](./img/performance.png)
+
+3. Awesome Sauce
+
+![awesome-sauce](./img/awesome-sauce.png)
+
 ## Reducers
 
+To change the store, you dispatch an action that is ultimately handled by a reducer. A reducer is actually quite simple. It's a function  
+that takes state in an action and returns new state.
 
+![reducer-wrong](./img/reducer-wrong.png)
+
+![reducer-correct](./img/reducer-correct.png)
+
+Reducers must be pure functions. This means that they should produce no side effects. You know you have a pure function if calling it with  
+the same set of arguments always returns the same value. Because reducers are supposed to be pure functions, there are three things that  
+you should never do in a reducer. You should never mutate arguments, you should never perform side effects like API calls or routing  
+transitions, and should never call non‑pure functions. A reducer's return value should depend solely on the values of its parameters, and  
+it should call no other non‑pure functions, such as date.now or math.random.
+
+Remember, instead of mutating state, you return a copy of what was passed in and Redux will use that to create the new store state.
+
+![reducer-eg](./img/reducer-eg.png)
+
+One might think that having one store would be limiting and lead to huge, monolithic stores that are hard to manage in practice, it's not a  
+problem. You can manage slices of your state changes through multiple reducers in Redux. When a store is created, Redux calls the reducers  
+and uses their return values as initial state, but you might wonder if we have multiple reducers, which one is called when an action is  
+dispatched. Well, the answer is all of them. All reducers get called when an action is dispatched. The switch statement inside each reducer  
+looks at the action type to determine if it has anything to do. This is why all reducers should return the untouched state as the default.  
+This way, if no case matches the action type past, the existing state is returned. So, for example, if I dispatch the DELETE_COURSE action  
+and my app has three reducers, one for courses, one for authors, and one that handles loading status, all three of these reducers will be  
+called, but only the reducer that actually handles the DELETE_COURSE action type will do anything. The others will simply return the state  
+that was passed to them.
+
+Remember all the reducers together form the complete picture of what's in the store.
+
+One might wonder if there is always a one to one mapping between reducers and actions. Nope. The Redux docs recommend using reducer  
+composition. This means a given action can be handled by more than one reducer. Bottom line, remember, each action can be handled by one or  
+more reducers and each reducer can handle one or more actions.
+
+## Look at normalizing state shape
+
+[Normalizing state shape](https://redux.js.org/usage/structuring-reducers/normalizing-state-shape)
