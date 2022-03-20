@@ -1,9 +1,12 @@
 import React from "react";
+import { connect } from "react-redux";
+import * as courseActions from "../../redux/actions/courseActions";
+import PropTypes from "prop-types";
+import { bindActionCreators } from "redux";
 
 class CoursesPage extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       course: {
         title: "",
@@ -19,7 +22,11 @@ class CoursesPage extends React.Component {
 
   handleSubmit = (event) => {
     event.preventDefault();
-    alert(this.state.course.title);
+    // Remember, you have to dispatch an action. If we merely called courseActions.createCourse without wrapping it in dispatch, then it won't do anything. It would just be a function that would return an object.
+    // this is one way of dispatching and action, other way is to use mapDispatchToProps and using bindActionCreators
+    // debugger;
+    this.props.actions.createCourse(this.state.course);
+    // alert(this.state.course.title);
   };
 
   render() {
@@ -34,9 +41,34 @@ class CoursesPage extends React.Component {
           value={this.state.course.title}
         />
         <input type="submit" value="Save" />
+        {this.props.courses.map((course) => (
+          <div key={course.title}>{course.title}</div>
+        ))}
       </form>
     );
   }
 }
 
-export default CoursesPage;
+CoursesPage.propTypes = {
+  courses: PropTypes.array.isRequired,
+  actions: PropTypes.object.isRequired,
+};
+
+// This function determines what state is passed to our component via props
+function mapStateToProps(state) {
+  // debugger;
+  return {
+    // Be specific. Request only the data your component needs. For example, if you expose entire redux store, the component will rerender when any data changes in the redux store.
+    // ownProps -> This param lets us access props that are being attached to this component. It's reference to the component's own props.
+    courses: state.courses,
+  };
+}
+
+// mapDispatchToProps -> this function lets us declare what action to pass to our component on props. (optional to connect method). When we omit it, our component gets a dispatch prop injected automatically.
+
+function mapDispatchToProps(dispatch) {
+  return {
+    actions: bindActionCreators(courseActions, dispatch),
+  };
+}
+export default connect(mapStateToProps, mapDispatchToProps)(CoursesPage);

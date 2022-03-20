@@ -5,7 +5,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./index.css";
 import App from "./components/App";
 import configureStore from "./redux/configureStore";
-import { Provider } from "react-redux";
+import { Provider as ReduxProvider } from "react-redux";
 
 // It can be useful to pass initial state into the store here if we are working on the server rendering or initializing the redux store with data from the local storage.
 
@@ -15,11 +15,10 @@ const store = configureStore();
 
 render(
   // Now our app will be able to access our Redux store because our entire app is being wrapped in the Provider component.
-  <Provider store={store}>
+  <ReduxProvider store={store}>
     <Router>
       <App />
     </Router>
-  </Provider>,
-
+  </ReduxProvider>,
   document.getElementById("app")
 );
