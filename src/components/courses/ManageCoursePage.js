@@ -4,10 +4,10 @@ import * as courseActions from "../../redux/actions/courseActions";
 import * as authorActions from "../../redux/actions/authorActions";
 import PropTypes from "prop-types";
 import { bindActionCreators } from "redux";
-import CourseList from "./CourseList";
 
 class ManageCoursePage extends React.Component {
   componentDidMount() {
+    const {}
     this.props.actions.loadCourses().catch((error) => {
       alert("Loading courses failed" + error);
     });
@@ -22,7 +22,6 @@ class ManageCoursePage extends React.Component {
       <>
         <h1>Manage Course</h1>
         <br />
-        <CourseList courses={this.props.courses} />
       </>
     );
   }
