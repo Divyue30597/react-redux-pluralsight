@@ -24,6 +24,9 @@ module.exports = {
     https: false,
   },
   plugins: [
+    new webpack.DefinePlugin({
+      "process.env.API_URL": JSON.stringify("http://localhost:3001"),
+    }),
     // For plugins, you specify an array. We're going to tell the plugin where to find our HTML template, which is in the src directory in index.html, and also tell it where to find our favicon, which is in that same directory.
     new HtmlWebpackPlugin({
       template: "src/index.html",

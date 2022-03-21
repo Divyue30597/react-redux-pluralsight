@@ -403,3 +403,35 @@ more reducers and each reducer can handle one or more actions.
 ## Look at normalizing state shape
 
 [Normalizing state shape](https://redux.js.org/usage/structuring-reducers/normalizing-state-shape)
+
+## Redux flow and setup
+
+![redux-setup](./img/redux-flow-code.png)
+
+![redux-flow](./img/redux-flow.png)
+
+## To handle Async operations in React-redux application - Redux-thunk
+
+![handle-async-operation](./img/to-handle-async-op-introduce-middleware.png)
+
+## Why Redux-thunk?
+
+![redux-thunk](./img/redux-thunk.png)
+
+**_Thunk_**: A function that wraps an expression to delay its evaluation.
+
+Example
+
+```javascript
+export function deleteAuthor(authorId) {
+  return (dispatch, getState) => {
+    return AuthorApi.deleteAuthor(authorId)
+      .then(() => {
+        dispatch(deletedAuthor(authorId));
+      })
+      .catch(handleError);
+  };
+}
+```
+
+[redux-thunk](https://redux.js.org/usage/writing-logic-thunks) -> Read this

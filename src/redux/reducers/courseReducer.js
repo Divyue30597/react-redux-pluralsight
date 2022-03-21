@@ -6,6 +6,9 @@ export default function courseReducer(state = [], action) {
       // debugger;
       return [...state, { ...action.payload }];
     }
+    case types.LOAD_COURSES_SUCCESS: {
+      return action.payload;
+    }
     default: {
       return state;
     }
