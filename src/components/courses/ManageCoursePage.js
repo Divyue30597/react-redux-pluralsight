@@ -5,6 +5,8 @@ import * as authorActions from "../../redux/actions/authorActions";
 import PropTypes from "prop-types";
 import CourseForm from "./CourseForm";
 import { courses, newCourse } from "../../../tools/mockData";
+import Spinner from "../common/Spinner";
+import { toast } from "react-toastify";
 
 // class ManageCoursePage extends React.Component {
 //   componentDidMount() {
@@ -38,7 +40,7 @@ function ManageCoursePage({
   loadAuthors,
   loadCourses,
   // now calling saveCourse in our component will call the saveCourse function we just bound to dispatch in mapDispatchToProps. instead of the simple saveCourse function which is imported up above.
-  saveCourse,
+  saveCourses,
   // we use rest operator to assign a new property which we have not destructured to an object called props.
   ...props
 }) {
@@ -46,6 +48,7 @@ function ManageCoursePage({
   const [course, setCourse] = useState({ ...props.course });
   // 2. See state is being initialized right here in this useState call, and this happens on initial load before the list of courses is available. So this logic on line 46 is performed once based on the course data that's available when the component is mounted. The problem is when the component is mounted, no course data is available quite yet. It's an asynchronous call. look for 3. below (useEffect)
   const [errors, setErrors] = useState({});
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (courses.length === 0) {
@@ -76,18 +79,43 @@ function ManageCoursePage({
     }));
   }
 
-  function handleSave(event) {
-    event.preventDefault();
-    saveCourse(course).then(() => history.push("/courses"));
+  function formIsValid() {
+    const { title, authorId, category } = courses;
+    const errors = {};
+    if (!title) errors.title = "Title is required.";
+    if (!authorId) errors.author = "Author is required";
+    if (!category) errors.category = "Category is required";
+
+    setErrors(errors);
+    // Form is valid if the errors object still has no properties
+    return Object.keys(errors).length === 0;
   }
 
-  return (
+  function handleSave(event) {
+    event.preventDefault();
+    if (!formIsValid()) return;
+    setSaving(true);
+    saveCourses(course)
+      .then(() => {
+        toast.success("Course Saved.");
+        history.push("/courses");
+      })
+      .catch((error) => {
+        setSaving(false);
+        setErrors({ onSave: error.message });
+      });
+  }
+
+  return authors.length === 0 || courses.length === 0 ? (
+    <Spinner />
+  ) : (
     <CourseForm
       course={course} // 1. The course we are passing here is declared at the top which makes it the copy of props.course. And we needed to make that copy so that we could hold data in state as we edited the course. for 2. (look in component)
       errors={errors}
       authors={authors}
       onChange={handleChange}
       onSave={handleSave}
+      saving={saving}
     />
   );
 }
@@ -98,7 +126,7 @@ ManageCoursePage.propTypes = {
   courses: PropTypes.array.isRequired,
   loadCourses: PropTypes.func.isRequired,
   loadAuthors: PropTypes.func.isRequired,
-  saveCourse: PropTypes.func.isRequired,
+  saveCourses: PropTypes.func.isRequired,
   history: PropTypes.object.isRequired,
 };
 
@@ -122,16 +150,16 @@ function mapStateToProps(state, ownProps) {
       : newCourse;
 
   return {
-    // Here we are passing and empty course
+    // Here we are passing an empty course
     course: course,
     courses: state.courses,
     authors: state.authors,
   };
 }
 
-// If we declare mapDispatchToProps as an object insteas, each property will automaticallly be bound to dispatch. For initial mapDispatchToProps function look at CoursePage.js file.
+// If we declare mapDispatchToProps as an object instead, each property will automaticallly be bound to dispatch. (For initial mapDispatchToProps function look at CoursePage.js file.)
 const mapDispatchToProps = {
-  saveCourse: courseActions.saveCourses,
+  saveCourses: courseActions.saveCourses,
   loadCourses: courseActions.loadCourses,
   loadAuthors: authorActions.loadAuthors,
 };
